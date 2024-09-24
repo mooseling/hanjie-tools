@@ -1,50 +1,50 @@
 import unittest
 from puzzle import Puzzle
-from utils import copySideClues
+from utils import copy_side_clues
 from square import Square
 
 class UtilsTest(unittest.TestCase):
-    def test_copySideClues(self) -> None:
-        sideClues = [
+    def test_copy_side_clues(self) -> None:
+        side_clues = [
             [1, 2, 3],
             [4, 5],
             [6],
             [7, 8, 9, 10]
         ]
 
-        copiedSideClues = copySideClues(sideClues)
+        copied_side_clues = copy_side_clues(side_clues)
 
-        self.assertEqual(sideClues, copiedSideClues)
-        self.assertFalse(sideClues is copiedSideClues)
-        self.assertFalse(sideClues[0] is copiedSideClues[0])
-        self.assertFalse(sideClues[1] is copiedSideClues[1])
-        self.assertFalse(sideClues[2] is copiedSideClues[2])
-        self.assertFalse(sideClues[3] is copiedSideClues[3])
+        self.assertEqual(side_clues, copied_side_clues)
+        self.assertFalse(side_clues is copied_side_clues)
+        self.assertFalse(side_clues[0] is copied_side_clues[0])
+        self.assertFalse(side_clues[1] is copied_side_clues[1])
+        self.assertFalse(side_clues[2] is copied_side_clues[2])
+        self.assertFalse(side_clues[3] is copied_side_clues[3])
 
 class SquareTest(unittest.TestCase):
     def test_getters(self) -> None:
-        self.assertEqual(Square.UNKNOWN.getGridChar(), ' ')
-        self.assertEqual(Square.UNKNOWN.getFriendlyString(), 'unknown')
-        self.assertEqual(Square.FILLED.getGridChar(), '#')
-        self.assertEqual(Square.FILLED.getFriendlyString(), 'filled')
-        self.assertEqual(Square.BLANK.getGridChar(), '/')
-        self.assertEqual(Square.BLANK.getFriendlyString(), 'blank')
+        self.assertEqual(Square.UNKNOWN.get_grid_char(), ' ')
+        self.assertEqual(Square.UNKNOWN.get_fiendly_string(), 'unknown')
+        self.assertEqual(Square.FILLED.get_grid_char(), '#')
+        self.assertEqual(Square.FILLED.get_fiendly_string(), 'filled')
+        self.assertEqual(Square.BLANK.get_grid_char(), '/')
+        self.assertEqual(Square.BLANK.get_fiendly_string(), 'blank')
 
 class PuzzleTest(unittest.TestCase):
     def test_init(self) -> None:
-        rowClues = [[1, 2], [3, 4], [5], [5], [1, 1]]
-        columnClues = [[1, 2], [3], [3], [1, 1, 1], [5], [5], [4], [2]]
+        row_clues = [[1, 2], [3, 4], [5], [5], [1, 1]]
+        column_clues = [[1, 2], [3], [3], [1, 1, 1], [5], [5], [4], [2]]
 
-        puzzle = Puzzle(5, 8, rowClues, columnClues)
+        puzzle = Puzzle(5, 8, row_clues, column_clues)
 
         self.assertEqual(len(puzzle.rows), 5)
         for row in puzzle.rows:
           self.assertEqual(len(row), 8)
 
-        self.assertEqual(puzzle.rowClues, rowClues)
-        self.assertFalse(puzzle.rowClues is rowClues) # check this list is copied, not referencing the original
-        self.assertEqual(puzzle.columnClues, columnClues)
-        self.assertFalse(puzzle.columnClues is columnClues)
+        self.assertEqual(puzzle.row_clues, row_clues)
+        self.assertFalse(puzzle.row_clues is row_clues) # check this list is copied, not referencing the original
+        self.assertEqual(puzzle.column_clues, column_clues)
+        self.assertFalse(puzzle.column_clues is column_clues)
 
 
 if __name__ == '__main__':

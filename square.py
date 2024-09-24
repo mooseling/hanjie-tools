@@ -5,8 +5,8 @@ class Square(Enum):
     FILLED = '#', 'filled'
     BLANK = '/', 'blank'
 
-    def getGridChar(self):
+    def get_grid_char(self):
         return self.value[0]
     
-    def getFriendlyString(self):
+    def get_fiendly_string(self):
         return self.value[1]

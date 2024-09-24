@@ -1,8 +1,4 @@
 from common_types import SideClues
 
-def copySideClues(sideClues: SideClues) -> SideClues:
-    sideCluesCopy: SideClues = []
-    for lineClues in sideClues:
-        sideCluesCopy.append(lineClues.copy())
-    
-    return sideCluesCopy
+def copy_side_clues(side_clues: SideClues) -> SideClues:
+    return [line_clues.copy() for line_clues in side_clues]

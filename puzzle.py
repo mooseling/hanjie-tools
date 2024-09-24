@@ -1,24 +1,24 @@
 from common_types import Line, SideClues
-from utils import copySideClues
+from utils import copy_side_clues
 from square import Square
 
 
 class Puzzle:
     rows: list[Line]
-    rowClues: SideClues
-    columnClues: SideClues
+    row_clues: SideClues
+    column_clues: SideClues
 
 
-    def __init__(self, numRows: int, numColumns: int, rowClues: SideClues, columnClues: SideClues) -> None:
-        self.rowClues = copySideClues(rowClues)
-        self.columnClues = copySideClues(columnClues)
+    def __init__(self, num_rows: int, num_columns: int, row_clues: SideClues, column_clues: SideClues) -> None:
+        self.row_clues = copy_side_clues(row_clues)
+        self.column_clues = copy_side_clues(column_clues)
 
-        self.rows = [[Square.UNKNOWN] * numColumns] * numRows
+        self.rows = [[Square.UNKNOWN] * num_columns] * num_rows
 
     
-    def getRow(self, rowIndex: int) -> Line:
-        return self.rows[rowIndex]
+    def get_row(self, row_index: int) -> Line:
+        return self.rows[row_index]
     
 
-    def getColumn(self, columnIndex: int) -> Line:
-        return [row[columnIndex] for row in self.rows]
+    def get_column(self, column_index: int) -> Line:
+        return [row[column_index] for row in self.rows]
