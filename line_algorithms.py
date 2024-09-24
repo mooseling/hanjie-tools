@@ -38,6 +38,13 @@ def check_overlaps(line: Line, block_lengths: LineClues) -> LineChanges:
             for square_index in range(block_bounds.max_start, block_bounds.min_end):
                 line_changes[square_index] = Square.FILLED
 
+            # If we've found the entire block, it's easy to put the dots in now
+            if found_length == block_length:
+                if block_bounds.max_start > 0:
+                    line_changes[block_bounds.max_start - 1] = Square.BLANK
+                if block_bounds.min_end < len(line) - 1:
+                    line_changes[block_bounds.min_end + 1] = Square.BLANK
+
 
 def check_complete_blocks(line: Line, block_lengths: LineClues) -> LineChanges:
     # TODO this is actually kinda hard now... We have to deduce which blocks are which in the line...
