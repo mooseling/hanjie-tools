@@ -27,8 +27,8 @@ class SquareTest(unittest.TestCase):
         self.assertEqual(Square.UNKNOWN.get_fiendly_string(), 'unknown')
         self.assertEqual(Square.FILLED.get_grid_char(), '#')
         self.assertEqual(Square.FILLED.get_fiendly_string(), 'filled')
-        self.assertEqual(Square.BLANK.get_grid_char(), '/')
-        self.assertEqual(Square.BLANK.get_fiendly_string(), 'blank')
+        self.assertEqual(Square.KNOWN_BLANK.get_grid_char(), '/')
+        self.assertEqual(Square.KNOWN_BLANK.get_fiendly_string(), 'blank')
 
 class PuzzleTest(unittest.TestCase):
     def test_init(self) -> None:
