@@ -1,8 +1,6 @@
-from utils import SideClues, copySideClues
+from common_types import Line, SideClues
+from utils import copySideClues
 from square import Square
-
-
-type Line = list[Square]
 
 
 class Puzzle:

@@ -1,4 +1,4 @@
-type SideClues = list[list[int]]
+from common_types import SideClues
 
 def copySideClues(sideClues: SideClues) -> SideClues:
     sideCluesCopy: SideClues = []
