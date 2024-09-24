@@ -39,7 +39,7 @@ class PuzzleTest(unittest.TestCase):
 
         self.assertEqual(len(puzzle.rows), 5)
         for row in puzzle.rows:
-          self.assertEqual(len(row), 8)
+            self.assertEqual(len(row), 8)
 
         self.assertEqual(puzzle.row_clues, row_clues)
         self.assertFalse(puzzle.row_clues is row_clues) # check this list is copied, not referencing the original
