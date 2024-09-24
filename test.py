@@ -1,4 +1,5 @@
 import unittest
+from puzzle import Puzzle
 from utils import copySideClues
 from square import Square
 
@@ -28,6 +29,22 @@ class SquareTest(unittest.TestCase):
         self.assertEqual(Square.FILLED.getFriendlyString(), 'filled')
         self.assertEqual(Square.BLANK.getGridChar(), '/')
         self.assertEqual(Square.BLANK.getFriendlyString(), 'blank')
+
+class PuzzleTest(unittest.TestCase):
+    def test_init(self) -> None:
+        rowClues = [[1, 2], [3, 4], [5], [5], [1, 1]]
+        columnClues = [[1, 2], [3], [3], [1, 1, 1], [5], [5], [4], [2]]
+
+        puzzle = Puzzle(5, 8, rowClues, columnClues)
+
+        self.assertEqual(len(puzzle.rows), 5)
+        for row in puzzle.rows:
+          self.assertEqual(len(row), 8)
+
+        self.assertEqual(puzzle.rowClues, rowClues)
+        self.assertFalse(puzzle.rowClues is rowClues) # check this list is copied, not referencing the original
+        self.assertEqual(puzzle.columnClues, columnClues)
+        self.assertFalse(puzzle.columnClues is columnClues)
 
 
 if __name__ == '__main__':
