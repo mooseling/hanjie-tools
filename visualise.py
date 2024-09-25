@@ -1,15 +1,29 @@
 import math
 from common_types import Line
 from puzzle import Puzzle
+from square import Square
 
 
 def visualise_puzzle(puzzle:Puzzle) -> str:
     column_headers = get_column_headers(puzzle)
-    return column_headers + '\n'.join([get_row_header(row_index) + visualise_row(row) for row_index, row in enumerate(puzzle.rows)])
+    return column_headers + '\n'.join([get_row_header(row_index) + visualise_row(row, row_index) for row_index, row in enumerate(puzzle.rows)])
 
 
-def visualise_row(row:Line) -> str:
-    return ''.join([cell.get_grid_char() for cell in row])
+def visualise_row(row:Line, row_index: int) -> str:
+    row_str = ''
+
+    for cell_index, cell in enumerate(row):
+        if cell == Square.UNKNOWN:
+            if cell_index % 5 == 4:
+                row_str += '|'
+            elif row_index % 5 == 4:
+                row_str += '_'
+            else:
+                row_str += cell.get_grid_char()
+        else:
+            row_str += cell.get_grid_char()
+
+    return row_str
 
 
 def get_row_header(row_index) -> str:
@@ -17,9 +31,8 @@ def get_row_header(row_index) -> str:
 
 
 def get_column_headers(puzzle: Puzzle) -> str:
-    row_count = len(puzzle.rows[0])
-    column_count = len(puzzle.rows)
-    max_digit_count = math.ceil(math.log10(row_count))
+    column_count = len(puzzle.rows[0])
+    max_digit_count = math.ceil(math.log10(column_count))
     header_digit_strs = ['   '] * max_digit_count
 
     for column_index in range(column_count):
