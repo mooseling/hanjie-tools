@@ -7,6 +7,11 @@ for row_index, row in enumerate(puzzle.rows):
     overlap_result = check_overlaps(row, puzzle.row_clues[row_index])
     puzzle.apply_row_changes(overlap_result, row_index)
 
+for column_index in range(len(puzzle.rows[0])):
+    column = puzzle.get_column(column_index)
+    overlap_result = check_overlaps(column, puzzle.column_clues[column_index])
+    puzzle.apply_column_changes(overlap_result, column_index)
+
 print(visualise_puzzle(puzzle))
 
 
