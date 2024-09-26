@@ -30,7 +30,3 @@ for column_index in range(len(puzzle.rows[0])):
 
 print(visualise_puzzle(puzzle))
 
-
-
-
-# print(row_index.__str__() + ''.join([square.get_grid_char() for square in overlap_result]))
