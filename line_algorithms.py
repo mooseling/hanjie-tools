@@ -30,10 +30,7 @@ def check_overlaps(line: Line, block_lengths: LineClues) -> LineChanges:
 
             # If we've found the entire block, it's easy to put the dots in now
             if found_length == block_length:
-                if max_start > 0:
-                    line_changes[max_start - 1] = Square.KNOWN_BLANK
-                if min_end < len(line) - 1:
-                    line_changes[min_end + 1] = Square.KNOWN_BLANK
+                surround_with_known_blanks(line_changes, max_start, min_end)
 
     return line_changes
 
@@ -52,6 +49,12 @@ def check_edge_hints(line: Line, block_lengths: LineClues) -> LineChanges:
         for index in range(filled_index, block_length):
             if line[index] != Square.FILLED:
                 line_changes[index] = Square.FILLED
+
+        # We may have just done the whole block, in which case we could put in a dot
+        if filled_index == 0:
+            surround_with_known_blanks(line_changes, 0, block_length - 1)
+
+
     
     block_length = block_lengths[len(block_lengths) - 1]
     subline_start = len(line) - block_length
@@ -61,6 +64,9 @@ def check_edge_hints(line: Line, block_lengths: LineClues) -> LineChanges:
         for index in range(subline_start, filled_index):
             if line[index] != Square.FILLED:
                 line_changes[index] = Square.FILLED
+
+        if inverted_filled_index == 0:
+            surround_with_known_blanks(line_changes, subline_start, filled_index)
 
     return line_changes
 
@@ -96,3 +102,10 @@ def get_next_index_where_block_fits(line: Line, block_length: int, start: int) -
 
 def get_blank_line_changes(line) -> LineChanges:
     return [Square.UNKNOWN] * len(line)
+
+
+def surround_with_known_blanks(line_changes:LineChanges, start: int, end: int) -> LineChanges:
+    if start > 0:
+        line_changes[start - 1] = Square.KNOWN_BLANK
+    if end < len(line_changes) - 1:
+        line_changes[end + 1] = Square.KNOWN_BLANK
