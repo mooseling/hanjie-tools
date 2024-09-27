@@ -1,12 +1,11 @@
 from typing import Callable
-from common_types import Line, LineClues
+from common_types import Line, LineChanges, LineClues
 from square import Square
 from utils import index_of, rev_list
 
 # A LineAlgorithm considers a line and returns a list of deduced changes
 # The form of these changes is the same as a Line, but we give it its own type to communicate its purpose
 # We don't want to mislead a developer that the output of an algorithm is the final result. It must be added.
-type LineChanges = Line
 type LineAlgorithm = Callable[[Line, LineClues], LineChanges]
 
 
