@@ -1,6 +1,6 @@
 import unittest
 from puzzle import Puzzle
-from utils import copy_side_clues
+from utils import copy_side_clues, index_of_any
 from square import Square
 
 class UtilsTest(unittest.TestCase):
@@ -21,13 +21,25 @@ class UtilsTest(unittest.TestCase):
         self.assertFalse(side_clues[2] is copied_side_clues[2])
         self.assertFalse(side_clues[3] is copied_side_clues[3])
 
+    def test_index_of_any(self) -> None:
+        line = [Square.UNKNOWN, Square.UNKNOWN, Square.UNKNOWN, Square.FILLED, Square.KNOWN_BLANK, Square.UNKNOWN]
+        self.assertEqual(index_of_any(line, [Square.FILLED, Square.KNOWN_BLANK]), 3)
+        self.assertEqual(index_of_any(line, [Square.KNOWN_BLANK, Square.FILLED]), 3)
+        self.assertEqual(index_of_any(line, [Square.UNKNOWN, Square.FILLED, Square.KNOWN_BLANK]), 0)
+        self.assertEqual(index_of_any(line, []), -1)
+
+        int_list = [0, 1, 2, 3, 4]
+        self.assertEqual(index_of_any(int_list, [2, 3]), 2)
+        self.assertEqual(index_of_any(int_list, [5, 6]), -1)
+        self.assertEqual(index_of_any(int_list, [5]), -1)
+
 class SquareTest(unittest.TestCase):
     def test_getters(self) -> None:
         self.assertEqual(Square.UNKNOWN.get_grid_char(), ' ')
         self.assertEqual(Square.UNKNOWN.get_fiendly_string(), 'unknown')
         self.assertEqual(Square.FILLED.get_grid_char(), '#')
         self.assertEqual(Square.FILLED.get_fiendly_string(), 'filled')
-        self.assertEqual(Square.KNOWN_BLANK.get_grid_char(), '/')
+        self.assertEqual(Square.KNOWN_BLANK.get_grid_char(), '⋅')
         self.assertEqual(Square.KNOWN_BLANK.get_fiendly_string(), 'blank')
 
 class PuzzleTest(unittest.TestCase):

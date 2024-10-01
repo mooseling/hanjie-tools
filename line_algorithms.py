@@ -44,7 +44,7 @@ def check_edge_hints(line: Line, block_lengths: LineClues) -> LineChanges:
 
     block_length = block_lengths[0]
     filled_index = index_of(line[:block_length], Square.FILLED)
-    if type(filled_index) == int:
+    if filled_index > -1:
         for index in range(filled_index, block_length):
             if line[index] != Square.FILLED:
                 line_changes[index] = Square.FILLED
@@ -58,7 +58,7 @@ def check_edge_hints(line: Line, block_lengths: LineClues) -> LineChanges:
     block_length = block_lengths[len(block_lengths) - 1]
     subline_start = len(line) - block_length
     inverted_filled_index = index_of(rev_list(line[subline_start:]), Square.FILLED)
-    if type(inverted_filled_index) == int:
+    if inverted_filled_index > -1:
         filled_index = len(line) - inverted_filled_index - 1
         for index in range(subline_start, filled_index):
             if line[index] != Square.FILLED:
@@ -93,7 +93,7 @@ def get_min_ends_of_blocks(line: Line, block_lengths: list[int]) -> list[int]:
 def get_next_index_where_block_fits(line: Line, block_length: int, start: int) -> int:
     sub_line = line[start:block_length]
     sub_index_of_wall = index_of(sub_line, Square.KNOWN_BLANK)
-    if sub_index_of_wall != False:
+    if sub_index_of_wall > -1:
         return get_next_index_where_block_fits(line, block_length, start + sub_index_of_wall + 1)
     
     return start
