@@ -1,5 +1,5 @@
 import time
-from example_hanjies import tabled as puzzle
+from example_hanjies import poolside as puzzle
 from line_algorithms import LineAlgorithm, check_overlaps, check_edge_hints, has_changes
 from visualise import visualise_puzzle
 
