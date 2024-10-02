@@ -1,5 +1,5 @@
 from typing import Callable
-from block_utils import get_limits
+from block_utils import get_candidate_clued_blocks, get_limits, get_visible_blocks
 from data_classes import Line
 from square import Square
 from utils import index_of, rev_list
@@ -65,6 +65,35 @@ def check_edge_hints(line: Line) -> LineChanges:
             surround_with_known_blanks(line_changes, subline_start, filled_index)
 
     return line_changes
+
+
+# With a visible block, we can narrow down which clued-blocks it could be
+# We may find that it must be complete, or that an edge is complete
+def check_candidate_clued_blocks_for_dots(line: Line) -> LineChanges:
+    line_changes = get_blank_line_changes(line)
+
+    for visible_block in get_visible_blocks(line):
+        candidate_clued_blocks = get_candidate_clued_blocks(visible_block, line)
+
+        candidate_lengths = {clued_block.length for clued_block in candidate_clued_blocks}
+        visible_block_length = visible_block.end - visible_block.start + 1
+        if len(candidate_lengths) == 1 and candidate_lengths.pop() == visible_block_length:
+            surround_with_known_blanks(line_changes, visible_block.start, visible_block.end)
+        else:
+            candidate_limits = [get_limits(clued_block, line) for clued_block in candidate_clued_blocks]
+
+            if visible_block.start > 0:
+                candidate_starts = {limits[0] for limits in candidate_limits}
+                if len(candidate_starts) == 1 and candidate_starts.pop() == visible_block.start:
+                    line_changes[visible_block.start - 1] = Square.KNOWN_BLANK
+
+            if visible_block.end < len(line.squares) - 1:
+                candidate_ends = {limits[1] for limits in candidate_limits}
+                if len(candidate_ends) == 1 and candidate_ends.pop() == visible_block.end:
+                    line_changes[visible_block.end + 1] = Square.KNOWN_BLANK
+
+    return line_changes
+
 
 
 def check_complete_blocks(line: Line) -> LineChanges:

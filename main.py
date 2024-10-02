@@ -1,13 +1,13 @@
 import time
 from example_hanjies import poolside as puzzle
-from line_algorithms import LineAlgorithm, check_overlaps, check_edge_hints, has_changes
+from line_algorithms import LineAlgorithm, check_candidate_clued_blocks_for_dots, check_overlaps, check_edge_hints, has_changes
 from visualise import visualise_puzzle
 
 frame_sleep_time = 0.25
 
 print(visualise_puzzle(puzzle))
 
-line_algorithm_list: list[LineAlgorithm] = [check_overlaps, check_edge_hints]
+line_algorithm_list: list[LineAlgorithm] = [check_overlaps, check_edge_hints, check_candidate_clued_blocks_for_dots]
 
 anything_has_changed = True
 while anything_has_changed:

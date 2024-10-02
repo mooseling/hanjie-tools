@@ -60,7 +60,14 @@ def get_visible_blocks(line: Line) -> list[VisibleBlock]:
 
 
 def get_candidate_clued_blocks(visible_block: VisibleBlock, line: Line) -> list[CluedBlock]:
-    pass
+    candidates = []
+
+    for clued_block in line.clued_blocks:
+        clued_block_limits = get_limits(clued_block, line)
+        if visible_block.start >= clued_block_limits[0] and visible_block.end <= clued_block_limits[1]:
+            candidates.append(clued_block)
+
+    return candidates
 
 
 
