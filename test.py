@@ -1,25 +1,12 @@
 import unittest
+from block_utils import get_limits
+from data_classes import CluedBlock, Line
 from puzzle import Puzzle
-from utils import copy_side_clues, index_of_any
+from utils import index_of_any
 from square import Square
 
+
 class UtilsTest(unittest.TestCase):
-    def test_copy_side_clues(self) -> None:
-        side_clues = [
-            [1, 2, 3],
-            [4, 5],
-            [6],
-            [7, 8, 9, 10]
-        ]
-
-        copied_side_clues = copy_side_clues(side_clues)
-
-        self.assertEqual(side_clues, copied_side_clues)
-        self.assertFalse(side_clues is copied_side_clues)
-        self.assertFalse(side_clues[0] is copied_side_clues[0])
-        self.assertFalse(side_clues[1] is copied_side_clues[1])
-        self.assertFalse(side_clues[2] is copied_side_clues[2])
-        self.assertFalse(side_clues[3] is copied_side_clues[3])
 
     def test_index_of_any(self) -> None:
         line = [Square.UNKNOWN, Square.UNKNOWN, Square.UNKNOWN, Square.FILLED, Square.KNOWN_BLANK, Square.UNKNOWN]
@@ -33,6 +20,7 @@ class UtilsTest(unittest.TestCase):
         self.assertEqual(index_of_any(int_list, [5, 6]), -1)
         self.assertEqual(index_of_any(int_list, [5]), -1)
 
+
 class SquareTest(unittest.TestCase):
     def test_getters(self) -> None:
         self.assertEqual(Square.UNKNOWN.get_grid_char(), ' ')
@@ -42,6 +30,7 @@ class SquareTest(unittest.TestCase):
         self.assertEqual(Square.KNOWN_BLANK.get_grid_char(), '⋅')
         self.assertEqual(Square.KNOWN_BLANK.get_fiendly_string(), 'blank')
 
+
 class PuzzleTest(unittest.TestCase):
     def test_init(self) -> None:
         row_clues = [[1, 2], [3, 4], [5], [5], [1, 1]]
@@ -49,15 +38,34 @@ class PuzzleTest(unittest.TestCase):
 
         puzzle = Puzzle(5, 8, row_clues, column_clues)
 
-        self.assertEqual(len(puzzle.rows), 5)
-        for row in puzzle.rows:
-            self.assertEqual(len(row), 8)
+        self.assertEqual(len(puzzle.get_rows()), 5)
+        self.assertEqual(len(puzzle.get_columns()), 8)
 
-        self.assertEqual(puzzle.row_clues, row_clues)
-        self.assertFalse(puzzle.row_clues is row_clues) # check this list is copied, not referencing the original
-        self.assertEqual(puzzle.column_clues, column_clues)
-        self.assertFalse(puzzle.column_clues is column_clues)
+        for row_index, row in enumerate(puzzle.get_rows()):
+            self.assertEqual(row.squares, [Square.UNKNOWN] * 8)
+            for clue_index, clued_block in enumerate(row.clued_blocks):
+                self.assertEqual(row_clues[row_index][clue_index], clued_block.length)
+
+        for column_index, column in enumerate(puzzle.get_columns()):
+            self.assertEqual(column.squares, [Square.UNKNOWN] * 5)
+            for clue_index, clued_block in enumerate(column.clued_blocks):
+                self.assertEqual(column_clues[column_index][clue_index], clued_block.length)
+
+
+class BlockUtilsTest(unittest.TestCase):
+    def test_get_limits(self) -> None:
+        clued_block_1 = CluedBlock(3)
+        clued_block_2 = CluedBlock(5)
+        line_with_2_wiggle_room = Line([clued_block_1, clued_block_2], [Square.UNKNOWN] * 11)
+        self.assertEqual(get_limits(clued_block_1, line_with_2_wiggle_room), [0, 4])
+        self.assertEqual(get_limits(clued_block_2, line_with_2_wiggle_room), [4, 10])
+
+        clued_block_3 = CluedBlock(3)
+        clued_block_4 = CluedBlock(3)
+        line_with_1_wiggle_room = Line([clued_block_3, clued_block_4], [Square.UNKNOWN] * 8)
+        self.assertEqual(get_limits(clued_block_3, line_with_1_wiggle_room), [0, 3])
+        self.assertEqual(get_limits(clued_block_4, line_with_1_wiggle_room), [4, 7])
 
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(exit=False)

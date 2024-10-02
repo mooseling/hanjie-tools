@@ -1,9 +1,9 @@
 import time
 from example_hanjies import tabled as puzzle
-from line_algorithms import LineAlgorithm, check_overlaps, check_edge_hints
-from utils import has_changes
+from line_algorithms import LineAlgorithm, check_overlaps, check_edge_hints, has_changes
 from visualise import visualise_puzzle
 
+frame_sleep_time = 0.25
 
 print(visualise_puzzle(puzzle))
 
@@ -14,19 +14,18 @@ while anything_has_changed:
     anything_has_changed = False
 
     for line_algorithm in line_algorithm_list:
-        for row_index, row in enumerate(puzzle.rows):
-            algorithm_result = line_algorithm(row, puzzle.row_clues[row_index])
+        for row_index, row in enumerate(puzzle.get_rows()):
+            algorithm_result = line_algorithm(row)
             anything_has_changed = has_changes(algorithm_result)
             if anything_has_changed:
-                puzzle.apply_row_changes(algorithm_result, row_index)
+                puzzle.apply_line_changes(algorithm_result, row_index=row_index)
                 print(visualise_puzzle(puzzle))
-                time.sleep(0.5)
+                time.sleep(frame_sleep_time)
 
-        for column_index in range(len(puzzle.rows[0])):
-            column = puzzle.get_column(column_index)
-            algorithm_result = line_algorithm(column, puzzle.column_clues[column_index])
+        for column_index, column in enumerate(puzzle.get_columns()):
+            algorithm_result = line_algorithm(column)
             anything_has_changed = has_changes(algorithm_result)
             if anything_has_changed:
-                puzzle.apply_column_changes(algorithm_result, column_index)
+                puzzle.apply_line_changes(algorithm_result, column_index=column_index)
                 print(visualise_puzzle(puzzle))
-                time.sleep(0.5)
+                time.sleep(frame_sleep_time)

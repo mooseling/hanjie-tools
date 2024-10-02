@@ -74,7 +74,7 @@ def _get_min_start(target_clued_block: CluedBlock, line: Line) -> int:
 
     for clued_block in line.clued_blocks:
         possible_start = _get_next_index_where_block_fits(line, clued_block.length, possible_start)
-        if clued_block == target_clued_block:
+        if clued_block is target_clued_block:
             return possible_start
         possible_start += clued_block.length + 1
 
@@ -87,15 +87,10 @@ def _get_max_end(target_clued_block: CluedBlock, line: Line) -> int:
     return len(line.squares) - inverted_min_start - 1
 
 
-
-
-
-
-
 def _get_next_index_where_block_fits(line: Line, block_length: int, start: int) -> int:
     sub_line = line.squares[start:block_length]
     sub_index_of_wall = index_of(sub_line, Square.KNOWN_BLANK)
-    if sub_index_of_wall != False:
+    if sub_index_of_wall > -1:
         return _get_next_index_where_block_fits(line, block_length, start + sub_index_of_wall + 1)
 
     return start
