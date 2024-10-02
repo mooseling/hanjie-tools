@@ -35,17 +35,18 @@ def is_found(clued_block: CluedBlock, line: Line) -> bool:
 
 
 def get_visible_blocks(line: Line) -> list[VisibleBlock]:
+    squares = line.squares
     visible_blocks = []
     search_start = 0
 
-    while search_start < len(line):
-        next_filled_index = index_of(line, Square.FILLED, search_start)
+    while search_start < len(squares):
+        next_filled_index = index_of(squares, Square.FILLED, search_start)
         if next_filled_index == -1:
             break # no more blocks visible in this line
 
-        next_unfilled_index = index_of_any(line, [Square.KNOWN_BLANK, Square.UNKNOWN], search_start)
+        next_unfilled_index = index_of_any(squares, [Square.KNOWN_BLANK, Square.UNKNOWN], next_filled_index + 1)
         if next_unfilled_index == -1:
-            visible_blocks.append(VisibleBlock(next_filled_index, len(line.squares) - 1))
+            visible_blocks.append(VisibleBlock(next_filled_index, len(squares) - 1))
             break
         
         visible_blocks.append(VisibleBlock(next_filled_index, next_unfilled_index - 1))
@@ -74,9 +75,10 @@ def _get_min_start(target_clued_block: CluedBlock, line: Line) -> int:
 
     for clued_block in line.clued_blocks:
         possible_start = _get_next_index_where_block_fits(line, clued_block.length, possible_start)
+        possible_start = _get_next_index_where_block_is_not_made_longer(line, clued_block.length, possible_start)
         if clued_block is target_clued_block:
             return possible_start
-        possible_start += clued_block.length + 1
+        possible_start += clued_block.length + 1 # + 1 ensures there's a gap after the block we just dropped
 
     # TODO throw exception? We should never get here.
 
@@ -95,6 +97,21 @@ def _get_next_index_where_block_fits(line: Line, block_length: int, start: int) 
 
     return start
     # Any failure cases here?
+
+
+# A block may fit in a space, but if there's squares immediately after that space, it doesn't really fit
+def _get_next_index_where_block_is_not_made_longer(line: Line, block_length: int, start: int) -> int:
+    next_square_index = start + block_length
+    visible_blocks = get_visible_blocks(line)
+    for visible_block in visible_blocks:
+        if visible_block.start == next_square_index:
+            visible_block_length = visible_block.end - visible_block.start + 1
+            if visible_block_length > block_length:
+                raise Exception(f'Trying to find the next spot for a block of length {block_length}, but encountered a longer visible block ({visible_block_length})')
+            return visible_block.end - block_length + 1
+
+    return start
+
 
 
 def _get_reversed_line(line: Line) -> Line:
