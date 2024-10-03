@@ -63,9 +63,11 @@ def get_candidate_clued_blocks(visible_block: VisibleBlock, line: Line) -> list[
     candidates = []
 
     for clued_block in line.clued_blocks:
-        clued_block_limits = get_limits(clued_block, line)
-        if visible_block.start >= clued_block_limits[0] and visible_block.end <= clued_block_limits[1]:
-            candidates.append(clued_block)
+        visible_block_length = visible_block.end - visible_block.start + 1
+        if visible_block_length <= clued_block.length:
+            clued_block_limits = get_limits(clued_block, line)
+            if visible_block.start >= clued_block_limits[0] and visible_block.end <= clued_block_limits[1]:
+                candidates.append(clued_block)
 
     return candidates
 
