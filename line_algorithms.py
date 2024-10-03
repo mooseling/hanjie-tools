@@ -69,7 +69,7 @@ def check_edge_hints(line: Line) -> LineChanges:
 
 # With a visible block, we can narrow down which clued-blocks it could be
 # We may find that it must be complete, or that an edge is complete
-def check_candidate_clued_blocks_for_dots(line: Line) -> LineChanges:
+def check_visible_blocks_for_dots(line: Line) -> LineChanges:
     line_changes = get_blank_line_changes(line)
 
     for visible_block in get_visible_blocks(line):
