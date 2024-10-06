@@ -19,15 +19,22 @@ from utils import index_of, index_of_any, rev_list
 
 
 def get_limits(clued_block: CluedBlock, line: Line) -> tuple[int, int]:
-    return [_get_min_start(clued_block, line), _get_max_end(clued_block, line)]
+    return (_get_min_start(clued_block, line), _get_max_end(clued_block, line))
 
 
-def get_candidate_visible_blocks(clued_block: CluedBlock, line: Line) -> list[VisibleBlock]:
-    pass
+def get_preceding_clued_blocks(clued_block: CluedBlock, line: Line) -> list[CluedBlock]:
+    index = index_of(line.clued_blocks, clued_block)
+    if index == -1:
+        raise Exception('This CluedBlock is not part of this line')
+    return line.clued_blocks[:index]
 
 
-def is_found(clued_block: CluedBlock, line: Line) -> bool:
-    pass # We may never need this
+# def get_candidate_visible_blocks(clued_block: CluedBlock, line: Line) -> list[VisibleBlock]:
+#     pass
+
+
+# def is_found(clued_block: CluedBlock, line: Line) -> bool:
+#     pass # We may never need this
 
 
 
@@ -36,7 +43,7 @@ def is_found(clued_block: CluedBlock, line: Line) -> bool:
 
 def get_visible_blocks(line: Line) -> list[VisibleBlock]:
     squares = line.squares
-    visible_blocks = []
+    visible_blocks: list[VisibleBlock] = []
     search_start = 0
 
     while search_start < len(squares):
@@ -59,17 +66,10 @@ def get_visible_blocks(line: Line) -> list[VisibleBlock]:
 # ========================= VisibleBlock Deductions ========================
 
 
-def get_candidate_clued_blocks(visible_block: VisibleBlock, line: Line) -> list[CluedBlock]:
-    candidates = []
-
-    for clued_block in line.clued_blocks:
-        visible_block_length = visible_block.end - visible_block.start + 1
-        if visible_block_length <= clued_block.length:
-            clued_block_limits = get_limits(clued_block, line)
-            if visible_block.start >= clued_block_limits[0] and visible_block.end <= clued_block_limits[1]:
-                candidates.append(clued_block)
-
-    return candidates
+def get_span(visible_blocks: list[VisibleBlock]) -> int:
+    start = min(map(lambda visible_block: visible_block.start, visible_blocks))
+    end = max(map(lambda visible_block: visible_block.end, visible_blocks))
+    return end - start + 1
 
 
 
@@ -89,11 +89,11 @@ def _get_min_start(target_clued_block: CluedBlock, line: Line) -> int:
             return possible_start
         possible_start += clued_block.length + 1 # + 1 ensures there's a gap after the block we just dropped
 
-    # TODO throw exception? We should never get here.
+    raise Exception('No min-start found')
 
 
 def _get_max_end(target_clued_block: CluedBlock, line: Line) -> int:
-    reversed_line = _get_reversed_line(line)
+    reversed_line = get_reversed_line(line)
     inverted_min_start = _get_min_start(target_clued_block, reversed_line)
     return len(line.squares) - inverted_min_start - 1
 
@@ -123,7 +123,7 @@ def _get_next_index_where_block_is_not_made_longer(line: Line, block_length: int
 
 
 
-def _get_reversed_line(line: Line) -> Line:
+def get_reversed_line(line: Line) -> Line:
     reversed_clues = rev_list(line.clued_blocks)
     reversed_squares = rev_list(line.squares)
     return Line(reversed_clues, reversed_squares)
