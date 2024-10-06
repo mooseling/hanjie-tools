@@ -111,8 +111,3 @@ def surround_with_known_blanks(line_changes:LineChanges, start: int, end: int) -
         line_changes[start - 1] = Square.KNOWN_BLANK
     if end < len(line_changes) - 1:
         line_changes[end + 1] = Square.KNOWN_BLANK
-
-
-def has_changes(line_changes: LineChanges) -> bool:
-    first_change_index = next((index for index, square in enumerate(line_changes) if square != Square.UNKNOWN), False)
-    return type(first_change_index) == int
