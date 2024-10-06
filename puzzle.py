@@ -4,8 +4,8 @@ from square import Square
 
 class Puzzle:
     _row_squares: list[list[Square]]
-    row_clues: list[CluedBlock]
-    column_clues: list[CluedBlock]
+    row_clues: list[list[CluedBlock]]
+    column_clues: list[list[CluedBlock]]
 
 
     def __init__(self, num_rows: int, num_columns: int, row_clues: list[list[int]], column_clues: list[list[int]]) -> None:
@@ -13,7 +13,7 @@ class Puzzle:
         self.column_clues = [[CluedBlock(length) for length in line_clues] for line_clues in column_clues]
 
         # don't use [[] * c] * r, this will make all the rows be the same list
-        self._row_squares = [[Square.UNKNOWN] * num_columns for x in range(num_rows)]
+        self._row_squares = [[Square.UNKNOWN] * num_columns for _ in range(num_rows)]
 
 
     def get_rows(self) -> list[Line]:
@@ -31,7 +31,7 @@ class Puzzle:
         return Line(self.column_clues[column_index], self._get_column_squares(column_index))
 
 
-    def apply_line_changes(self, changes: list[Square], *, row_index: int = None, column_index: int = None) -> None:
+    def apply_line_changes(self, changes: list[Square], *, row_index: int|None = None, column_index: int|None = None) -> None:
         if row_index != None and column_index != None:
             raise Exception('Only try to change one row or column at a time')
         
