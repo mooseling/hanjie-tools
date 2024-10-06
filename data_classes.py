@@ -16,6 +16,9 @@ class CluedBlock:
     # --> Visible blocks that could be it
     # --> Whether we've found it
 
+    def __hash__(self) -> int:
+        return id(self)
+
 
 @dataclass
 class VisibleBlock:
@@ -23,6 +26,9 @@ class VisibleBlock:
     end: int
     # Things we will compute:
     # --> CluedBlocks that it could be
+
+    def __hash__(self) -> int:
+        return id(self)
 
 
 @dataclass
