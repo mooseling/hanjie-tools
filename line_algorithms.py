@@ -1,5 +1,5 @@
 from typing import Callable
-from block_utils import get_reversed_line, get_limits, get_preceding_clued_blocks, get_span, get_visible_blocks
+from block_utils import get_length, get_reversed_line, get_limits, get_preceding_clued_blocks, get_span, get_visible_blocks
 from data_classes import CluedBlock, Line, VisibleBlock
 from square import Square
 from utils import index_of, rev_list
@@ -76,8 +76,7 @@ def check_visible_blocks_for_dots(line: Line) -> LineChanges:
 
     for visible_block, candidate_clued_blocks in possible_block_mappings.items():
         candidate_lengths = {clued_block.length for clued_block in candidate_clued_blocks}
-        visible_block_length = visible_block.end - visible_block.start + 1
-        if len(candidate_lengths) == 1 and candidate_lengths.pop() == visible_block_length:
+        if len(candidate_lengths) == 1 and candidate_lengths.pop() == get_length(visible_block):
             _surround_with_known_blanks(line_changes, visible_block.start, visible_block.end)
         else:
             candidate_limits = [get_limits(clued_block, line) for clued_block in candidate_clued_blocks]
@@ -113,8 +112,7 @@ def get_candidate_clued_blocks(visible_block: VisibleBlock, line: Line) -> set[C
     candidates: set[CluedBlock] = set()
 
     for clued_block in line.clued_blocks:
-        visible_block_length = visible_block.end - visible_block.start + 1
-        if visible_block_length <= clued_block.length:
+        if get_length(visible_block) <= clued_block.length:
             clued_block_limits = get_limits(clued_block, line)
             if visible_block.start >= clued_block_limits[0] and visible_block.end <= clued_block_limits[1]:
                 candidates = candidates | {clued_block}
