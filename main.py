@@ -1,6 +1,6 @@
 import time
 from example_hanjies import poolside as puzzle
-from line_algorithms import LineAlgorithm, LineChanges, check_visible_blocks_for_dots, check_overlaps, check_edge_hints
+from line_algorithms import LineAlgorithm, LineChanges, check_possible_visible_clued_mappings, check_overlaps, check_edge_hints
 from square import Square
 from visualise import visualise_puzzle
 
@@ -14,11 +14,11 @@ def has_changes(line_changes: LineChanges, line_squares: list[Square]) -> bool:
 
 
 
-frame_sleep_time = 0.25
+frame_sleep_time = 0.1 # 0.25
 
 print(visualise_puzzle(puzzle))
 
-line_algorithm_list: list[LineAlgorithm] = [check_overlaps, check_edge_hints, check_visible_blocks_for_dots]
+line_algorithm_list: list[LineAlgorithm] = [check_overlaps, check_edge_hints, check_possible_visible_clued_mappings]
 
 anything_has_changed_this_round = True
 while anything_has_changed_this_round:

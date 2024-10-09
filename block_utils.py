@@ -68,9 +68,15 @@ def get_visible_blocks(line: Line) -> list[VisibleBlock]:
 
 
 def get_span(visible_blocks: list[VisibleBlock]) -> int:
-    start = min(map(lambda visible_block: visible_block.start, visible_blocks))
-    end = max(map(lambda visible_block: visible_block.end, visible_blocks))
-    return end - start + 1
+    limits = get_span_limits(visible_blocks)
+    return limits[1] - limits[0] + 1
+
+
+def get_span_limits(visible_blocks: list[VisibleBlock]) -> tuple[int, int]:
+    return (
+        min(map(lambda visible_block: visible_block.start, visible_blocks)),
+        max(map(lambda visible_block: visible_block.end, visible_blocks))
+    )
 
 
 def get_length(visible_block: VisibleBlock) -> int:

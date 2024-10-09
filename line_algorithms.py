@@ -1,5 +1,5 @@
 from typing import Callable
-from block_utils import get_length, get_reversed_line, get_limits, get_preceding_clued_blocks, get_span, get_visible_blocks
+from block_utils import get_length, get_reversed_line, get_limits, get_preceding_clued_blocks, get_span, get_span_limits, get_visible_blocks
 from data_classes import CluedBlock, Line, VisibleBlock
 from square import Square
 from utils import index_of, rev_list
@@ -68,8 +68,8 @@ def check_edge_hints(line: Line) -> LineChanges:
 
 
 # With a visible block, we can narrow down which clued-blocks it could be
-# We may find that it must be complete, or that an edge is complete
-def check_visible_blocks_for_dots(line: Line) -> LineChanges:
+# We may find that it must be complete, or that an edge is complete, etc
+def check_possible_visible_clued_mappings(line: Line) -> LineChanges:
     line_changes = _get_blank_line_changes(line)
 
     possible_block_mappings = _get_possible_block_mappings(line)
@@ -77,8 +77,10 @@ def check_visible_blocks_for_dots(line: Line) -> LineChanges:
     for visible_block, candidate_clued_blocks in possible_block_mappings.items():
         candidate_lengths = {clued_block.length for clued_block in candidate_clued_blocks}
         if len(candidate_lengths) == 1 and candidate_lengths.pop() == get_length(visible_block):
+            # We may not know exactly which CluedBlock this is, but we know it is now complete
             _surround_with_known_blanks(line_changes, visible_block.start, visible_block.end)
         else:
+            # We now check if we can put a dot at either end, if all possible CluedBlocks must end there
             candidate_limits = [get_limits(clued_block, line) for clued_block in candidate_clued_blocks]
 
             if visible_block.start > 0:
@@ -90,6 +92,46 @@ def check_visible_blocks_for_dots(line: Line) -> LineChanges:
                 candidate_ends = {limits[1] for limits in candidate_limits}
                 if len(candidate_ends) == 1 and candidate_ends.pop() == visible_block.end:
                     line_changes[visible_block.end + 1] = Square.KNOWN_BLANK
+
+    # If a clued-block is the only option for 2 or more visible-blocks, we can connect them
+    for clued_block in line.clued_blocks:
+        visible_blocks_with_only_this_candidate: list[VisibleBlock] = []
+        for visible_block, candidate_clued_blocks in possible_block_mappings.items():
+            if len(candidate_clued_blocks) == 1 and clued_block in candidate_clued_blocks:
+                visible_blocks_with_only_this_candidate.append(visible_block)
+        
+        if len(visible_blocks_with_only_this_candidate) > 1:
+            limits = get_span_limits(visible_blocks_with_only_this_candidate)
+            _fill_range(line_changes, limits[0], limits[1])
+
+    # If the visible-block is near a dot, we may be able to extend it based on minimum candidate length
+    for visible_block, candidate_clued_blocks in possible_block_mappings.items():
+        minimum_candidate_length = min([clued_block.length for clued_block in candidate_clued_blocks])
+        visible_block_length = get_length(visible_block)
+        if visible_block_length < minimum_candidate_length:
+            index_of_next_dot = index_of(line.squares, Square.KNOWN_BLANK, visible_block.end + 1)
+            index_of_previous_dot = len(line.squares) - index_of(rev_list(line.squares), Square.KNOWN_BLANK, len(line.squares) - visible_block.start) - 1
+
+            # If there's either no dot before or after, we replace it with the index of the edge of the line
+            # I'm not convinced this needs handling, thanks to knowing that we run the simple check_edge_hints algorithm earlier
+            # But can't hurt, might avoid some bug cases
+            index_of_next_dot = index_of_next_dot if index_of_next_dot > -1 else len(line.squares)
+            # interestingly, we don't have to do this with previous dot, since the index we would assign it is -1 anyway
+
+            distance_to_next_dot = index_of_next_dot - visible_block.end
+            distance_to_previous_dot = visible_block.start - index_of_previous_dot
+
+            if distance_to_next_dot < distance_to_previous_dot:
+                new_start_index = index_of_next_dot - minimum_candidate_length
+                new_length = visible_block.end - new_start_index + 1
+                if new_length <= minimum_candidate_length:
+                    line_changes[new_start_index:visible_block.start] = [Square.FILLED] * (visible_block.start - new_start_index)
+            else:
+                new_end_index = index_of_previous_dot + minimum_candidate_length
+                new_length = new_end_index - visible_block.start + 1
+                if new_length <= minimum_candidate_length:
+                    line_changes[visible_block.end + 1:new_end_index + 1] = [Square.FILLED] * (new_end_index - visible_block.end)
+
 
     return line_changes
 
@@ -151,3 +193,7 @@ def _surround_with_known_blanks(line_changes:LineChanges, start: int, end: int) 
         line_changes[start - 1] = Square.KNOWN_BLANK
     if end < len(line_changes) - 1:
         line_changes[end + 1] = Square.KNOWN_BLANK
+
+
+def _fill_range(line_changes: LineChanges, start: int, end: int) -> None:
+    line_changes[start:end + 1] = [Square.FILLED] * (end - start + 1)
