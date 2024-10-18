@@ -27,6 +27,9 @@ class VisibleBlock:
     # Things we will compute:
     # --> CluedBlocks that it could be
 
+    def get_length(self) -> int:
+        return self.end - self.start + 1
+
     def __hash__(self) -> int:
         return id(self)
 

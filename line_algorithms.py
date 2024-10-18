@@ -1,5 +1,5 @@
 from typing import Callable
-from block_utils import get_length, get_reversed_line, get_limits, get_preceding_clued_blocks, get_span, get_span_limits, get_visible_blocks
+from block_utils import get_reversed_line, get_limits, get_preceding_clued_blocks, get_span, get_span_limits, get_visible_blocks
 from data_classes import CluedBlock, Line, VisibleBlock
 from square import Square
 from utils import index_of, rev_list
@@ -76,7 +76,7 @@ def check_possible_visible_clued_mappings(line: Line) -> LineChanges:
 
     for visible_block, candidate_clued_blocks in possible_block_mappings.items():
         candidate_lengths = {clued_block.length for clued_block in candidate_clued_blocks}
-        if len(candidate_lengths) == 1 and candidate_lengths.pop() == get_length(visible_block):
+        if len(candidate_lengths) == 1 and candidate_lengths.pop() == visible_block.get_length():
             # We may not know exactly which CluedBlock this is, but we know it is now complete
             _surround_with_known_blanks(line_changes, visible_block.start, visible_block.end)
         else:
@@ -107,7 +107,7 @@ def check_possible_visible_clued_mappings(line: Line) -> LineChanges:
     # If the visible-block is near a dot, we may be able to extend it based on minimum candidate length
     for visible_block, candidate_clued_blocks in possible_block_mappings.items():
         minimum_candidate_length = min([clued_block.length for clued_block in candidate_clued_blocks])
-        visible_block_length = get_length(visible_block)
+        visible_block_length = visible_block.get_length()
         if visible_block_length < minimum_candidate_length:
             index_of_next_dot = index_of(line.squares, Square.KNOWN_BLANK, visible_block.end + 1)
             index_of_previous_dot = len(line.squares) - index_of(rev_list(line.squares), Square.KNOWN_BLANK, len(line.squares) - visible_block.start) - 1
@@ -154,7 +154,7 @@ def get_candidate_clued_blocks(visible_block: VisibleBlock, line: Line) -> set[C
     candidates: set[CluedBlock] = set()
 
     for clued_block in line.clued_blocks:
-        if get_length(visible_block) <= clued_block.length:
+        if visible_block.get_length() <= clued_block.length:
             clued_block_limits = get_limits(clued_block, line)
             if visible_block.start >= clued_block_limits[0] and visible_block.end <= clued_block_limits[1]:
                 candidates = candidates | {clued_block}

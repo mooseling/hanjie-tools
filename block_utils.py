@@ -79,10 +79,6 @@ def get_span_limits(visible_blocks: list[VisibleBlock]) -> tuple[int, int]:
     )
 
 
-def get_length(visible_block: VisibleBlock) -> int:
-    return visible_block.end - visible_block.start + 1
-
-
 
 # ==================================================================
 # ======================== Private Functions ========================
@@ -117,7 +113,7 @@ def _get_next_possible_start_for_block(clued_block: CluedBlock, line: Line, poss
         if visible_block_immediately_after == None:
             return possible_start
         else:
-            if get_length(visible_block_immediately_after) > clued_block.length:
+            if visible_block_immediately_after.get_length() > clued_block.length:
                 # It's fine, this just means this visible-block is an earlier clued-block, and we have to go past it
                 possible_start = visible_block_immediately_after.end + 2
             else:
