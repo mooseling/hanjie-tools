@@ -22,7 +22,7 @@ def check_overlaps(line: Line) -> LineChanges:
         found_length = min_end - max_start + 1
 
         if found_length > 0:
-            line_changes[max_start:min_end] = [Square.FILLED] * found_length
+            line_changes[max_start:min_end + 1] = [Square.FILLED] * found_length
 
             # If we've found the entire block, it's easy to put the dots in now
             if found_length == block_length:
