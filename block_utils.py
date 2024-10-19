@@ -108,37 +108,52 @@ def _get_next_possible_start_for_block(clued_block: CluedBlock, line: Line, poss
     visible_blocks = get_visible_blocks(line)
 
     while possible_start < len(line.squares):
-        possible_start = _get_next_index_where_block_fits(line, clued_block.length, possible_start)
-        visible_block_immediately_after = _get_visible_block_immediately_after(clued_block, possible_start, visible_blocks)
-        if visible_block_immediately_after == None:
-            return possible_start
+        possible_start = _get_next_space_not_blocked_by_dot(line, clued_block, possible_start)
+
+        # We may have landed touching a visible-block, which drags the clued-block forward. Otherwise it would make it longer.
+        possible_start += _get_amount_extended_forward(clued_block, possible_start, visible_blocks)
+
+        # But now, after dragging forward, another visible-block may be extending us backward
+        if _is_extended_backward(clued_block, possible_start, visible_blocks):
+            # If so, we move to the next unknown space and keep looking
+            next_possible_start = index_of_any(line.squares, [Square.UNKNOWN, Square.FILLED], possible_start + clued_block.length + 1)
+            if next_possible_start == -1:
+                raise Exception("Couldn't fit this CluedBlock anywhere!")
+            possible_start = next_possible_start
         else:
-            if visible_block_immediately_after.get_length() > clued_block.length:
-                # It's fine, this just means this visible-block is an earlier clued-block, and we have to go past it
-                possible_start = visible_block_immediately_after.end + 2
-            else:
-                # This visible-block might be this clued-block, but we have to nudge forward a bit so we don't make it too long
-                return visible_block_immediately_after.end - clued_block.length + 1
+            return possible_start
 
-    raise Exception("Didn't expect to ever get here. Looking for a space for a block but didn't find any.")
+    raise Exception("Couldn't fit this CluedBlock anywhere!")
 
 
-def _get_next_index_where_block_fits(line: Line, block_length: int, start: int) -> int:
-    sub_line = line.squares[start:start + block_length]
+def _get_amount_extended_forward(clued_block: CluedBlock, start: int, visible_blocks: list[VisibleBlock]) -> int:
+    index_immediately_after_block = start + clued_block.length
+    for visible_block in visible_blocks:
+        if visible_block.start > index_immediately_after_block:
+            return 0 # As soon as we are on visible-blocks after this space, we don't need to check any more
+        if visible_block.end >= index_immediately_after_block:
+            return visible_block.end - start - clued_block.length + 1
+    return 0
+
+
+def _is_extended_backward(clued_block: CluedBlock, start: int, visible_blocks: list[VisibleBlock]) -> bool:
+    index_immediately_before_block = start - 1
+    for visible_block in visible_blocks:
+        if visible_block.start > index_immediately_before_block:
+            return False # As soon as we are passed the beginning of the CluedBlock, we don't need to check any more VisibleBlocks
+        if visible_block.end >= index_immediately_before_block:
+            return True
+    return False
+
+
+def _get_next_space_not_blocked_by_dot(line: Line, clued_block:CluedBlock, start: int) -> int:
+    sub_line = line.squares[start:start + clued_block.length]
     sub_index_of_wall = index_of(sub_line, Square.KNOWN_BLANK)
     if sub_index_of_wall > -1:
-        return _get_next_index_where_block_fits(line, block_length, start + sub_index_of_wall + 1)
+        return _get_next_space_not_blocked_by_dot(line, clued_block, start + sub_index_of_wall + 1)
 
     return start
     # Any failure cases here?
-
-
-def _get_visible_block_immediately_after(clued_block: CluedBlock, start: int, visible_blocks: list[VisibleBlock]) -> VisibleBlock|None:
-    index_immediately_after_block = start + clued_block.length
-    for visible_block in visible_blocks:
-        if visible_block.start == index_immediately_after_block:
-            return visible_block
-    return None
 
 
 def get_reversed_line(line: Line) -> Line:
