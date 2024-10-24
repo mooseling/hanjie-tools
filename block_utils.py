@@ -115,11 +115,7 @@ def _get_next_possible_start_for_block(clued_block: CluedBlock, line: Line, poss
 
         # But now, after dragging forward, another visible-block may be extending us backward
         if _is_extended_backward(clued_block, possible_start, visible_blocks):
-            # If so, we move to the next unknown space and keep looking
-            next_possible_start = index_of_any(line.squares, [Square.UNKNOWN, Square.FILLED], possible_start + clued_block.length + 1)
-            if next_possible_start == -1:
-                raise Exception("Couldn't fit this CluedBlock anywhere!")
-            possible_start = next_possible_start
+            possible_start += 1 # We just creep forwards and see what happens
         else:
             return possible_start
 
