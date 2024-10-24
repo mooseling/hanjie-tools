@@ -184,6 +184,26 @@ def _get_mapping_without_forward_clue_violations(visible_blocks: list[VisibleBlo
     return visible_to_clued_block_map
 
 
+def find_known_blank_regions(line: Line) -> LineChanges:
+    line_changes = _get_blank_line_changes(line)
+    block_limits_list = [get_limits(clued_block, line) for clued_block in line.clued_blocks]
+
+    for square_index, _ in enumerate(line_changes):
+        if not _is_possibly_in_a_clued_block(square_index, block_limits_list):
+            line_changes[square_index] = Square.KNOWN_BLANK
+
+    return line_changes
+
+
+
+def _is_possibly_in_a_clued_block(square_index: int, block_limits_list: list[tuple[int, int]]) -> bool:
+    for limits in block_limits_list:
+        if square_index >= limits[0] and square_index <= limits[1]:
+            return True
+
+    return False
+
+
 def _get_blank_line_changes(line: Line) -> LineChanges:
     return [Square.UNKNOWN] * len(line.squares)
 
