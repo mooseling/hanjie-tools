@@ -46,3 +46,6 @@ while anything_has_changed_this_round:
                 puzzle.apply_line_changes(algorithm_result, column_index=column_index)
                 visualiser.visualise_puzzle(puzzle)
 
+print("Done. Joining display process...")
+
+visualiser.display_process.join()
