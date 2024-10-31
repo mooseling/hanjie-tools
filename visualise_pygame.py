@@ -20,19 +20,20 @@ fill_colour = (125, 125, 125)
 default_line_width = 1
 thick_line_width = 3
 
-type PuzzleQueue = mp.Queue[Puzzle] # Shouldn't need this, but I'm getting a weird error using the raw type elsewhere
+# Shouldn't need this, but I'm getting a weird error using the raw type as a function parameter type
+type PuzzleQueue = mp.Queue[Puzzle]
 
 
 class PygamePuzzleVisualiser:
     def __init__(self, puzzle: Puzzle):
-        self.queue: PuzzleQueue = mp.Queue()
-        display_process = mp.Process(target = pygame_puzzle_display_loop,
-                   args = [puzzle, self.queue])
-        display_process.start()
+        self.puzzle_update_queue: PuzzleQueue = mp.Queue()
+        self.display_process = mp.Process(target = pygame_puzzle_display_loop,
+                   args = [puzzle, self.puzzle_update_queue])
+        self.display_process.start()
 
 
     def visualise_puzzle(self, puzzle: Puzzle):
-        self.queue.put(puzzle)
+        self.puzzle_update_queue.put(puzzle)
 
 
 class CachedPuzzleDisplayProps:
@@ -47,19 +48,24 @@ class CachedPuzzleDisplayProps:
         self.dot_offset = (self.cell_width / 2) - 1 + default_line_width
 
 
-def pygame_puzzle_display_loop(puzzle: Puzzle, queue: PuzzleQueue):
+def pygame_puzzle_display_loop(puzzle: Puzzle, puzzle_update_queue: PuzzleQueue):
     cached_props = CachedPuzzleDisplayProps(puzzle)
 
+    print("Pygame init...")
     pygame.init()
+    print("Set display mode, which inits pyagme display...")
     window = pygame.display.set_mode(window_size)
+    print("Fill window with white")
     window.fill((255, 255, 255))
 
     while True:
-        if not queue.empty():
-                display_puzzle(window, queue.get(), cached_props)
+        if not puzzle_update_queue.empty():
+                print("Queue is not empty, updating display")
+                display_puzzle(window, puzzle_update_queue.get(), cached_props)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                print("Pygame received a quit event, ending display process")
                 pygame.quit()
                 return
 
