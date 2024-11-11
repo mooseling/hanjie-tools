@@ -1,5 +1,5 @@
 from typing import Callable
-from block_utils import get_reversed_line, get_limits, get_preceding_clued_blocks, get_span, get_span_limits, get_visible_blocks
+from block_utils import get_reversed_line, get_naive_limits, get_preceding_clued_blocks, get_span, get_span_limits, get_visible_blocks
 from data_classes import CluedBlock, Line, VisibleBlock
 from square import Square
 from utils import index_of, rev_list
@@ -13,7 +13,7 @@ type LineAlgorithm = Callable[[Line], LineChanges]
 
 def check_overlaps(line: Line) -> LineChanges:
     line_changes = _get_blank_line_changes(line)
-    block_limits_list = [get_limits(clued_block, line) for clued_block in line.clued_blocks]
+    block_limits_list = [get_naive_limits(clued_block, line) for clued_block in line.clued_blocks]
 
     for block_index, block_limits in enumerate(block_limits_list):
         block_length = line.clued_blocks[block_index].length
@@ -74,6 +74,7 @@ def check_possible_visible_clued_mappings(line: Line) -> LineChanges:
 
     possible_block_mappings = _get_possible_block_mappings(line)
 
+    # First check possible dots at either end
     for visible_block, candidate_clued_blocks in possible_block_mappings.items():
         candidate_lengths = {clued_block.length for clued_block in candidate_clued_blocks}
         if len(candidate_lengths) == 1 and candidate_lengths.pop() == visible_block.get_length():
@@ -81,7 +82,7 @@ def check_possible_visible_clued_mappings(line: Line) -> LineChanges:
             _surround_with_known_blanks(line_changes, visible_block.start, visible_block.end)
         else:
             # We now check if we can put a dot at either end, if all possible CluedBlocks must end there
-            candidate_limits = [get_limits(clued_block, line) for clued_block in candidate_clued_blocks]
+            candidate_limits = [get_naive_limits(clued_block, line) for clued_block in candidate_clued_blocks]
 
             if visible_block.start > 0:
                 candidate_starts = {limits[0] for limits in candidate_limits}
@@ -155,7 +156,7 @@ def get_candidate_clued_blocks(visible_block: VisibleBlock, line: Line) -> set[C
 
     for clued_block in line.clued_blocks:
         if visible_block.get_length() <= clued_block.length:
-            clued_block_limits = get_limits(clued_block, line)
+            clued_block_limits = get_naive_limits(clued_block, line)
             if visible_block.start >= clued_block_limits[0] and visible_block.end <= clued_block_limits[1]:
                 candidates = candidates | {clued_block}
 
@@ -186,7 +187,7 @@ def _get_mapping_without_forward_clue_violations(visible_blocks: list[VisibleBlo
 
 def find_known_blank_regions(line: Line) -> LineChanges:
     line_changes = _get_blank_line_changes(line)
-    block_limits_list = [get_limits(clued_block, line) for clued_block in line.clued_blocks]
+    block_limits_list = [get_naive_limits(clued_block, line) for clued_block in line.clued_blocks]
 
     for square_index, _ in enumerate(line_changes):
         if not _is_possibly_in_a_clued_block(square_index, block_limits_list):

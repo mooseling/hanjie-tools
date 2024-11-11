@@ -18,8 +18,10 @@ from utils import index_of, index_of_any, rev_list
 # ====================== CluedBlock Deductions =====================
 
 
-# It's getting increasingly complicated to get the limits... This really is an algorithm. But what really is an algorithm?
-def get_limits(clued_block: CluedBlock, line: Line) -> tuple[int, int]:
+# Naive limits are the range within which a CluedBlock must fall, but with a limited set of deductions:
+# Deductions used: Can't sit on a dot, can't be extended by existing filled squares
+# Deductions ignored: VisibleBlock correspondance
+def get_naive_limits(clued_block: CluedBlock, line: Line) -> tuple[int, int]:
     return (_get_min_start(clued_block, line), _get_max_end(clued_block, line))
 
 
