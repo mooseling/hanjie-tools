@@ -1,5 +1,5 @@
 from typing import Callable
-from block_utils import get_reversed_line, get_naive_limits, get_preceding_clued_blocks, get_span, get_span_limits, get_visible_blocks
+from block_utils import get_amount_extended_forward, get_reversed_line, get_naive_limits, get_preceding_clued_blocks, get_span, get_span_limits, get_visible_blocks, is_extended_backward, is_on_a_dot
 from data_classes import CluedBlock, Line, VisibleBlock
 from square import Square
 from utils import index_of, rev_list
@@ -72,7 +72,7 @@ def check_edge_hints(line: Line) -> LineChanges:
 def check_possible_visible_clued_mappings(line: Line) -> LineChanges:
     line_changes = _get_blank_line_changes(line)
 
-    possible_block_mappings = _get_possible_block_mappings(line)
+    possible_block_mappings = get_possible_block_mappings(line)
 
     # First check possible dots at either end
     for visible_block, candidate_clued_blocks in possible_block_mappings.items():
@@ -133,11 +133,52 @@ def check_possible_visible_clued_mappings(line: Line) -> LineChanges:
                 if new_length <= minimum_candidate_length:
                     line_changes[visible_block.end + 1:new_end_index + 1] = [Square.FILLED] * (new_end_index - visible_block.end)
 
+    # If a visible-block only has one possible clued-block, we may be able to fill in some squares
+    for visible_block, candidate_clued_blocks in possible_block_mappings.items():
+        if len(candidate_clued_blocks) == 1:
+            for clued_block in candidate_clued_blocks:
+                # First get all the starts where this clued-block is valid, given that it is this visible-block
+                start_search_range = (visible_block.end - clued_block.length + 1, visible_block.start)
+                possible_starts = get_possible_starts_in_range(clued_block, get_visible_blocks(line), line, start_search_range)
+                filled_square_search_range = (start_search_range[0], visible_block.start + clued_block.length - 1)
+                for square_index in range(filled_square_search_range[0], filled_square_search_range[1]):
+                    # Check this square is in every possible position for this clued_block
+                    if is_in_every_possible_clued_block_position(square_index, possible_starts, clued_block):
+                        line_changes[square_index] = Square.FILLED
 
     return line_changes
 
 
-def _get_possible_block_mappings(line: Line) -> dict[VisibleBlock, set[CluedBlock]]:
+def is_in_every_possible_clued_block_position(square_index: int, possible_starts: set[int], clued_block: CluedBlock) -> bool:
+    for start in possible_starts:
+        if square_index < start or square_index > start + clued_block.length - 1:
+            return False
+    return True
+
+
+def get_possible_starts_in_range(clued_block: CluedBlock,
+                                 visible_blocks: list[VisibleBlock],
+                                 line: Line,
+                                 search_range: tuple[int, int]) -> set[int]:
+    possible_start_index = search_range[0]
+    possible_positions: set[int] = set()
+
+    while possible_start_index <= search_range[1]:
+        if is_extended_backward(clued_block, possible_start_index, visible_blocks):
+            possible_start_index += 1
+        else:
+            amount_extended_forward = get_amount_extended_forward(clued_block, possible_start_index, visible_blocks)
+            if amount_extended_forward > 0:
+                possible_start_index += amount_extended_forward
+            else:
+                if not is_on_a_dot(clued_block, possible_start_index, line):
+                    possible_positions.add(possible_start_index)
+                possible_start_index += 1
+
+    return possible_positions
+
+
+def get_possible_block_mappings(line: Line) -> dict[VisibleBlock, set[CluedBlock]]:
     visible_blocks = get_visible_blocks(line)
     
     visible_to_clued_block_map: dict[VisibleBlock, set[CluedBlock]] = {}

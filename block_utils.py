@@ -113,10 +113,10 @@ def _get_next_possible_start_for_block(clued_block: CluedBlock, line: Line, poss
         possible_start = _get_next_space_not_blocked_by_dot(line, clued_block, possible_start)
 
         # We may have landed touching a visible-block, which drags the clued-block forward. Otherwise it would make it longer.
-        possible_start += _get_amount_extended_forward(clued_block, possible_start, visible_blocks)
+        possible_start += get_amount_extended_forward(clued_block, possible_start, visible_blocks)
 
         # But now, after dragging forward, another visible-block may be extending us backward
-        if _is_extended_backward(clued_block, possible_start, visible_blocks):
+        if is_extended_backward(clued_block, possible_start, visible_blocks):
             possible_start += 1 # We just creep forwards and see what happens
         else:
             return possible_start
@@ -124,7 +124,7 @@ def _get_next_possible_start_for_block(clued_block: CluedBlock, line: Line, poss
     raise Exception("Couldn't fit this CluedBlock anywhere!")
 
 
-def _get_amount_extended_forward(clued_block: CluedBlock, start: int, visible_blocks: list[VisibleBlock]) -> int:
+def get_amount_extended_forward(clued_block: CluedBlock, start: int, visible_blocks: list[VisibleBlock]) -> int:
     index_immediately_after_block = start + clued_block.length
     for visible_block in visible_blocks:
         if visible_block.start > index_immediately_after_block:
@@ -134,7 +134,7 @@ def _get_amount_extended_forward(clued_block: CluedBlock, start: int, visible_bl
     return 0
 
 
-def _is_extended_backward(clued_block: CluedBlock, start: int, visible_blocks: list[VisibleBlock]) -> bool:
+def is_extended_backward(clued_block: CluedBlock, start: int, visible_blocks: list[VisibleBlock]) -> bool:
     index_immediately_before_block = start - 1
     for visible_block in visible_blocks:
         if visible_block.start > index_immediately_before_block:
@@ -142,6 +142,12 @@ def _is_extended_backward(clued_block: CluedBlock, start: int, visible_blocks: l
         if visible_block.end >= index_immediately_before_block:
             return True
     return False
+
+
+def is_on_a_dot(clued_block: CluedBlock, start: int, line: Line) -> bool:
+    sub_line = line.squares[start:start + clued_block.length]
+    sub_index_of_wall = index_of(sub_line, Square.KNOWN_BLANK)
+    return sub_index_of_wall > -1
 
 
 def _get_next_space_not_blocked_by_dot(line: Line, clued_block:CluedBlock, start: int) -> int:
