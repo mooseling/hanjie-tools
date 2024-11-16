@@ -64,13 +64,13 @@ class BlockUtilsTest(unittest.TestCase):
     def test_get_limits(self) -> None:
         clued_block_1 = CluedBlock(3)
         clued_block_2 = CluedBlock(5)
-        line_with_2_wiggle_room = Line([clued_block_1, clued_block_2], [Square.UNKNOWN] * 11)
+        line_with_2_wiggle_room = Line([clued_block_1, clued_block_2], [Square.UNKNOWN] * 11, 1, 'row')
         self.assertEqual(get_naive_limits(clued_block_1, line_with_2_wiggle_room), (0, 4))
         self.assertEqual(get_naive_limits(clued_block_2, line_with_2_wiggle_room), (4, 10))
 
         clued_block_3 = CluedBlock(3)
         clued_block_4 = CluedBlock(3)
-        line_with_1_wiggle_room = Line([clued_block_3, clued_block_4], [Square.UNKNOWN] * 8)
+        line_with_1_wiggle_room = Line([clued_block_3, clued_block_4], [Square.UNKNOWN] * 8, 1, 'row')
         self.assertEqual(get_naive_limits(clued_block_3, line_with_1_wiggle_room), (0, 3))
         self.assertEqual(get_naive_limits(clued_block_4, line_with_1_wiggle_room), (4, 7))
 

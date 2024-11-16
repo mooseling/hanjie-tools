@@ -38,6 +38,9 @@ class VisibleBlock:
 class Line:
     clued_blocks: list[CluedBlock]
     squares: list[Square]
+    index: int # For debugging
+    orientation: str # For debugging
+
     # Things we will compute:
     # --> Visible blocks
     # --> Known-blanks (Squares that no blocks can fall into)

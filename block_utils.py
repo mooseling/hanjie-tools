@@ -163,4 +163,4 @@ def _get_next_space_not_blocked_by_dot(line: Line, clued_block:CluedBlock, start
 def get_reversed_line(line: Line) -> Line:
     reversed_clues = rev_list(line.clued_blocks)
     reversed_squares = rev_list(line.squares)
-    return Line(reversed_clues, reversed_squares)
+    return Line(reversed_clues, reversed_squares, line.index, line.orientation)

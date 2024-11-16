@@ -24,11 +24,11 @@ class Puzzle:
 
 
     def get_row(self, row_index: int) -> Line:
-        return Line(self.row_clues[row_index], self._row_squares[row_index])
+        return Line(self.row_clues[row_index], self._row_squares[row_index], row_index, 'row')
 
 
     def get_column(self, column_index: int) -> Line:
-        return Line(self.column_clues[column_index], self._get_column_squares(column_index))
+        return Line(self.column_clues[column_index], self._get_column_squares(column_index), column_index, 'column')
 
 
     def apply_line_changes(self, changes: list[Square], *, row_index: int|None = None, column_index: int|None = None) -> None:
