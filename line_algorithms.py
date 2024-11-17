@@ -240,6 +240,29 @@ def find_known_blank_regions(line: Line) -> LineChanges:
     return line_changes
 
 
+# This one feels really dumb... Surely we can get this as part of a more general deduction
+def fill_in_finished_line(line: Line) -> LineChanges:
+    line_changes = _get_blank_line_changes(line)
+    
+    if all_blocks_match(line):
+        for square_index, square_value in enumerate(line.squares):
+            if square_value == Square.UNKNOWN:
+                line_changes[square_index] = Square.KNOWN_BLANK
+
+    return line_changes
+
+
+def all_blocks_match(line: Line) -> bool:
+    visible_blocks = get_visible_blocks(line)
+    if len(visible_blocks) != len(line.clued_blocks):
+        return False
+
+    for index, clued_block in enumerate(line.clued_blocks):
+        if get_span([visible_blocks[index]]) != clued_block.length:
+            return False
+
+    return True
+
 
 def _is_possibly_in_a_clued_block(square_index: int, block_limits_list: list[tuple[int, int]]) -> bool:
     for limits in block_limits_list:
