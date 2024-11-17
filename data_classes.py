@@ -11,6 +11,8 @@ from square import Square
 @dataclass
 class CluedBlock:
     length: int
+    index: int # For debugging
+
     # Things we will compute:
     # --> Known limits
     # --> Visible blocks that could be it
@@ -24,6 +26,8 @@ class CluedBlock:
 class VisibleBlock:
     start: int
     end: int
+    index: int # For debugging
+
     # Things we will compute:
     # --> CluedBlocks that it could be
 
@@ -38,8 +42,9 @@ class VisibleBlock:
 class Line:
     clued_blocks: list[CluedBlock]
     squares: list[Square]
-    index: int # For debugging
-    orientation: str # For debugging
+    index: int        # For debugging
+    orientation: str  # For debugging
+    is_reversed: bool # For debugging
 
     # Things we will compute:
     # --> Visible blocks

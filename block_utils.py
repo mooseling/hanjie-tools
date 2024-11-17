@@ -48,6 +48,7 @@ def get_visible_blocks(line: Line) -> list[VisibleBlock]:
     squares = line.squares
     visible_blocks: list[VisibleBlock] = []
     search_start = 0
+    index = 0
 
     while search_start < len(squares):
         next_filled_index = index_of(squares, Square.FILLED, search_start)
@@ -56,11 +57,12 @@ def get_visible_blocks(line: Line) -> list[VisibleBlock]:
 
         next_unfilled_index = index_of_any(squares, [Square.KNOWN_BLANK, Square.UNKNOWN], next_filled_index + 1)
         if next_unfilled_index == -1:
-            visible_blocks.append(VisibleBlock(next_filled_index, len(squares) - 1))
+            visible_blocks.append(VisibleBlock(next_filled_index, len(squares) - 1, index))
             break
         
-        visible_blocks.append(VisibleBlock(next_filled_index, next_unfilled_index - 1))
+        visible_blocks.append(VisibleBlock(next_filled_index, next_unfilled_index - 1, index))
         search_start = next_unfilled_index + 1
+        index += 1
 
     return visible_blocks
 
@@ -163,4 +165,4 @@ def _get_next_space_not_blocked_by_dot(line: Line, clued_block:CluedBlock, start
 def get_reversed_line(line: Line) -> Line:
     reversed_clues = rev_list(line.clued_blocks)
     reversed_squares = rev_list(line.squares)
-    return Line(reversed_clues, reversed_squares, line.index, line.orientation)
+    return Line(reversed_clues, reversed_squares, line.index, line.orientation, not line.is_reversed)

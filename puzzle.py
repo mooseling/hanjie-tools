@@ -9,8 +9,8 @@ class Puzzle:
 
 
     def __init__(self, num_rows: int, num_columns: int, row_clues: list[list[int]], column_clues: list[list[int]]) -> None:
-        self.row_clues = [[CluedBlock(length) for length in line_clues] for line_clues in row_clues]
-        self.column_clues = [[CluedBlock(length) for length in line_clues] for line_clues in column_clues]
+        self.row_clues = [[CluedBlock(length, index) for index, length in enumerate(line_clues)] for line_clues in row_clues]
+        self.column_clues = [[CluedBlock(length, index) for index, length in enumerate(line_clues)] for line_clues in column_clues]
 
         # don't use [[] * c] * r, this will make all the rows be the same list
         self._row_squares = [[Square.UNKNOWN] * num_columns for _ in range(num_rows)]
@@ -24,11 +24,11 @@ class Puzzle:
 
 
     def get_row(self, row_index: int) -> Line:
-        return Line(self.row_clues[row_index], self._row_squares[row_index], row_index, 'row')
+        return Line(self.row_clues[row_index], self._row_squares[row_index], row_index, 'row', False)
 
 
     def get_column(self, column_index: int) -> Line:
-        return Line(self.column_clues[column_index], self._get_column_squares(column_index), column_index, 'column')
+        return Line(self.column_clues[column_index], self._get_column_squares(column_index), column_index, 'column', False)
 
 
     def apply_line_changes(self, changes: list[Square], *, row_index: int|None = None, column_index: int|None = None) -> None:
