@@ -258,7 +258,7 @@ def all_blocks_match(line: Line) -> bool:
         return False
 
     for index, clued_block in enumerate(line.clued_blocks):
-        if get_span([visible_blocks[index]]) != clued_block.length:
+        if visible_blocks[index].get_length() != clued_block.length:
             return False
 
     return True
