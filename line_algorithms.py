@@ -146,6 +146,32 @@ def check_possible_visible_clued_mappings(line: Line) -> LineChanges:
                     if is_in_every_possible_clued_block_position(square_index, possible_starts, clued_block):
                         line_changes[square_index] = Square.FILLED
 
+    # When there are gaps between visible blocks, we may be able to add dots
+    visible_blocks = list(possible_block_mappings.keys())
+    visible_blocks.sort(key=lambda vb: vb.index)
+    for visible_block, candidate_clued_blocks in possible_block_mappings.items():
+        if len(candidate_clued_blocks) == 1:
+            for clued_block in candidate_clued_blocks:
+                if clued_block.index < len(line.clued_blocks) - 1:
+                    next_clued_block = line.clued_blocks[clued_block.index + 1]
+                    # Consider next visible block
+                    # If it has just one candidate clued block:
+                    #   If it's the same clued-block, we can fill in the in between squares. This is already done above.
+                    #   If it is the _next_ clued block, we check the possible extents and may find dots
+                    #   If it's any other clued block, we know nothing, because the _next_ clued block is somewhere in between
+                    if visible_block.index < len(visible_blocks) - 1:
+                        next_visible_block = visible_blocks[visible_block.index + 1]
+                        next_visible_blocks_candidates = possible_block_mappings[next_visible_block]
+                        if next_visible_blocks_candidates == {next_clued_block}:
+                            # We now know: _this_ visible-block has just clued-block n as a candidate
+                            # And the next visible-block has just clued-block n+1 as a candidate
+                            # If there is enough gap in between, we can fill in some dots
+                            dot_region_start = visible_block.start + clued_block.length
+                            dot_region_end = next_visible_block.end - next_clued_block.length
+                            if dot_region_end >= dot_region_start:
+                                for square_index in range(dot_region_start, dot_region_end):
+                                    line_changes[square_index] = Square.KNOWN_BLANK
+
     return line_changes
 
 
