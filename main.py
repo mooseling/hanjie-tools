@@ -1,4 +1,4 @@
-from example_hanjies import poolside as puzzle
+from example_hanjies import tabled as puzzle
 from line_algorithms import LineAlgorithm, LineChanges, check_possible_visible_clued_mappings, check_overlaps, check_edge_hints, fill_in_finished_line, find_known_blank_regions
 from square import Square
 from visualise_pygame import PygamePuzzleVisualiser
