@@ -205,7 +205,10 @@ def get_candidate_clued_blocks(visible_block: VisibleBlock, line: Line) -> set[C
 
 
 def _get_mapping_without_forward_clue_violations(visible_blocks: list[VisibleBlock], visible_to_clued_block_map: dict[VisibleBlock, set[CluedBlock]], line: Line) -> dict[VisibleBlock, set[CluedBlock]]:
-    for visible_block_index, visible_block in enumerate(visible_blocks):
+    # We have to iterate the visible-blocks backwards to remove all invalid mappings
+    # We find invalid mappings by checking if later visible blocks are left with no possible clued-blocks if we remove one
+    # But this won't work if they have multiple invalid clued-block mappings, since removing just one will leave the others
+    for visible_block_index, visible_block in reversed(list(enumerate(visible_blocks))):
         for clued_block in visible_to_clued_block_map[visible_block]:
             # Logic: If this visible-block is this clued-block, all later visible blocks cannot be it, or any preceding clued-blocks
             # If this leaves them with no candidate clued-blocks, it's impossible that this visible-block is this clued-block
