@@ -1,5 +1,5 @@
 from example_hanjies import tabled as puzzle
-from line_algorithms import LineAlgorithm, LineChanges, check_possible_visible_clued_mappings, check_overlaps, check_edge_hints, fill_in_finished_line, find_known_blank_regions
+from line_algorithms import LineAlgorithm, LineChanges, check_possible_visible_clued_mappings, check_overlaps, check_edge_hints, find_known_blank_regions
 from square import Square
 from visualise_pygame import PygamePuzzleVisualiser
 import multiprocessing as mp
@@ -17,7 +17,7 @@ def main():
 
     visualiser = PygamePuzzleVisualiser(puzzle)
 
-    line_algorithm_list: list[LineAlgorithm] = [check_overlaps, check_edge_hints, check_possible_visible_clued_mappings, find_known_blank_regions, fill_in_finished_line]
+    line_algorithm_list: list[LineAlgorithm] = [check_overlaps, check_edge_hints, check_possible_visible_clued_mappings, find_known_blank_regions]
 
     anything_has_changed_this_round = True
     while anything_has_changed_this_round:
