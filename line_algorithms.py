@@ -172,6 +172,22 @@ def check_possible_visible_clued_mappings(line: Line) -> LineChanges:
                                 for square_index in range(dot_region_start, dot_region_end):
                                     line_changes[square_index] = Square.KNOWN_BLANK
 
+                # If this clued-block is the first or last, we should do the same checks, but against the start/end of the line
+                if clued_block.index == 0:
+                    dot_region_start = 0
+                    dot_region_end = visible_block.end - clued_block.length
+                    if dot_region_end >= dot_region_start:
+                                for square_index in range(dot_region_start, dot_region_end):
+                                    line_changes[square_index] = Square.KNOWN_BLANK
+
+                last_index = len(line.clued_blocks) - 1
+                if clued_block.index == last_index:
+                    dot_region_start = visible_block.start + clued_block.length
+                    dot_region_end = last_index
+                    if dot_region_end >= dot_region_start:
+                                for square_index in range(dot_region_start, dot_region_end):
+                                    line_changes[square_index] = Square.KNOWN_BLANK
+
     return line_changes
 
 
